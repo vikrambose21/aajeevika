@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Aptitude Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .quiz-card, .result-card, .start-card {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .answer-btn.selected {
+            background-color: #f5f3ff; /* bg-violet-50 */
+            border-color: #7c3aed; /* border-violet-600 */
+            color: #7c3aed;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+    <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="font-bold text-xl text-teal-600 flex items-center">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Aajeevika
+            </div>
+            <div class="hidden md:flex items-center space-x-8 text-gray-600">
+                <a href="dashboard.html" class="hover:text-violet-600">Dashboard</a>
+                <a href="https://www.india.gov.in/topics/education/higher-education" target="_blank" rel="noopener noreferrer" class="hover:text-violet-600">Resources</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="container mx-auto">
+            <div class="bg-white rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden max-w-6xl mx-auto">
+                
+                <div class="hidden md:block md:w-5/12 p-12 bg-violet-50/50">
+                    <div class="flex flex-col h-full justify-center">
+                        <img src="https://i.ibb.co/dD3Gqg2/undraw-feeling-proud-qne1.png" alt="Illustration of a person planning their career path" class="w-full h-auto object-contain">
+                        <h2 class="text-2xl font-bold text-gray-800 mt-6">Unlock Your Potential.</h2>
+                        <p class="text-gray-600 mt-2">This quiz is the first step towards a future you're passionate about.</p>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-7/12 p-8 md:p-12 flex flex-col justify-center">
+                    
+                    <div id="start-screen" class="start-card text-center">
+                        <h1 class="text-3xl md:text-4xl font-bold text-violet-700 mb-4">Find Your Perfect Career Path</h1>
+                        <p class="text-gray-600 mb-8">Confused about what to study? This quiz will help you understand your core interests and suggest the best stream for you.</p>
+                        <button id="start-quiz-btn" class="w-full md:w-auto bg-violet-600 text-white font-bold py-3 px-10 rounded-lg hover:bg-violet-700 transition-colors duration-300 shadow-lg">
+                            Start the Quiz
+                        </button>
+                    </div>
+
+                    <div id="quiz-container" class="hidden quiz-card">
+                        <div class="mb-6">
+                            <p class="text-sm font-medium text-gray-600 mb-2">Question <span id="question-counter"></span> of 20</p>
+                            <div class="bg-gray-200 rounded-full h-2">
+                                <div id="progress-bar" class="bg-teal-500 h-2 rounded-full transition-all duration-300 ease-out"></div>
+                            </div>
+                        </div>
+                        
+                        <div id="question-card" class="">
+                            <h2 id="question-text" class="text-xl md:text-2xl font-semibold mb-6 min-h-[6rem]"></h2>
+                            <div id="answer-buttons" class="grid grid-cols-1 gap-3">
+                            </div>
+                            <div class="mt-8 flex justify-between items-center">
+                                <div id="pagination-dots" class="flex space-x-1.5">
+                                </div>
+                                <button id="next-btn" class="bg-violet-600 text-white font-bold py-2 px-8 rounded-lg hover:bg-violet-700 transition-colors duration-300 shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed">
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="result-container" class="hidden result-card">
+                        <div class="text-center">
+                            <h2 class="text-2xl md:text-3xl font-bold mb-2">Your Recommended Stream is:</h2>
+                            <p id="result-stream" class="text-5xl font-extrabold text-violet-600 mb-4"></p>
+                            <div id="result-description" class="text-gray-600 mb-6 text-left bg-gray-100 p-4 rounded-lg"></div>
+                            
+                            <div class="grid md:grid-cols-2 gap-6 text-left">
+                                <div id="course-suggestions">
+                                    <h3 class="font-bold text-lg mb-2 text-teal-700">Potential Degree Courses:</h3>
+                                    <ul id="course-list" class="list-disc list-inside text-gray-700 space-y-1"></ul>
+                                </div>
+                                <div id="career-paths">
+                                    <h3 class="font-bold text-lg mb-2 text-teal-700">Possible Career Paths:</h3>
+                                    <ul id="career-list" class="list-disc list-inside text-gray-700 space-y-1"></ul>
+                                </div>
+                            </div>
+                            <div class="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
+                                <a href="career.html" class="w-full sm:w-auto bg-violet-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-violet-700 transition-colors duration-300 shadow-md text-center">
+                                    View your Career Options
+                                </a>
+                                <a href="dashboard.html" class="w-full sm:w-auto bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-lg hover:bg-gray-300 transition-colors duration-300">
+                                    Back to Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        const startScreen = document.getElementById('start-screen');
+        const startQuizBtn = document.getElementById('start-quiz-btn');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultContainer = document.getElementById('result-container');
+        const questionText = document.getElementById('question-text');
+        const answerButtons = document.getElementById('answer-buttons');
+        const progressBar = document.getElementById('progress-bar');
+        const questionCounter = document.getElementById('question-counter');
+        const paginationDots = document.getElementById('pagination-dots');
+        const nextBtn = document.getElementById('next-btn');
+        const resultStream = document.getElementById('result-stream');
+        const resultDescription = document.getElementById('result-description');
+        const courseList = document.getElementById('course-list');
+        const careerList = document.getElementById('career-list');
+        
+        // FIX: Restored the full questions array
+        const questions = [
+            { question: "Which of these activities sounds most interesting to you?", answers: [{ text: "Understanding how things work (e.g., machines, nature)", value: "S" }, { text: "Expressing ideas through writing, art, or music", value: "A" }, { text: "Managing money, organizing events, or running a business", value: "C" }, { text: "Building, repairing, or creating something with your hands", value: "V" }] },
+            { question: "Which school subjects do you enjoy the most?", answers: [{ text: "Physics, Chemistry, Biology, or Math", value: "S" }, { text: "History, Literature, Social Studies, or Languages", value: "A" }, { text: "Economics, Business Studies, or Accountancy", value: "C" }, { text: "Computer class, woodwork, or other practical workshops", value: "V" }] },
+            { question: "In your free time, you'd rather:", answers: [{ text: "Watch science documentaries or solve puzzles", value: "S" }, { text: "Read books, visit museums, or learn a new language", value: "A" }, { text: "Follow the stock market or plan a budget for a trip", value: "C" }, { text: "Tinker with gadgets, try a new recipe, or do some gardening", value: "V" }] },
+            { question: "What kind of topics grab your attention in the news?", answers: [{ text: "New scientific discoveries and tech innovations", value: "S" }, { text: "Cultural events, social justice issues, and politics", value: "A" }, { text: "Business mergers, economic trends, and market analysis", value: "C" }, { text: "DIY project tutorials and new construction technologies", value: "V" }] },
+            { question: "If you were to create something, it would be a:", answers: [{ text: "New theory or a piece of software to solve a problem", value: "S" }, { text: "Novel, a film, or a piece of art", value: "A" }, { text: "Successful business plan or an investment portfolio", value: "C" }, { text: "Piece of furniture, a custom vehicle, or an electronic device", value: "V" }] },
+            { question: "What's more important to you in a future job?", answers: [{ text: "Innovation, discovery, and pushing the boundaries of knowledge", value: "S" }, { text: "Helping people, serving the community, and understanding society", value: "A" }, { text: "Financial growth, leadership, and managing resources effectively", value: "C" }, { text: "Developing a specific skill to a high level and seeing tangible results", value: "V" }] },
+            { question: "When facing a complex problem, what is your first instinct?", answers: [{ text: "Break it down and analyze it logically", value: "S" }, { text: "Consider how it affects people and their emotions", value: "A" }, { text: "Look for the most efficient and profitable solution", value: "C" }, { text: "Start experimenting with hands-on, practical solutions", value: "V" }] },
+            { question: "What kind of impact do you want your work to have?", answers: [{ text: "To advance human knowledge and technology", value: "S" }, { text: "To inspire, educate, or advocate for social change", value: "A" }, { text: "To create wealth, jobs, and economic stability", value: "C" }, { text: "To build, maintain, or improve the physical world around us", value: "V" }] },
+            { question: "You feel most energized when you are:", answers: [{ text: "Solving a difficult logical or mathematical problem", value: "S" }, { text: "Debating ideas and understanding different perspectives", value: "A" }, { text: "Negotiating a deal or organizing a complex project", value: "C" }, { text: "Actively working on a project and seeing it take shape", value: "V" }] },
+            { question: "Which of these famous figures do you admire the most?", answers: [{ text: "Albert Einstein (for his scientific genius)", value: "S" }, { text: "Nelson Mandela (for his social leadership)", value: "A" }, { text: "Warren Buffett (for his business acumen)", value: "C" }, { text: "Steve Wozniak (for his hands-on engineering skill)", value: "V" }] },
+            { question: "What kind of work environment do you prefer?", answers: [{ text: "A laboratory, a research field, or a tech company", value: "S" }, { text: "A classroom, a government office, a museum, or a studio", value: "A" }, { text: "A corporate office, a bank, or your own start-up", value: "C" }, { text: "A workshop, a construction site, or a technical service center", value: "V" }] },
+            { question: "Which of these global trends seems most compelling to you?", answers: [{ text: "Artificial Intelligence and Biotechnology", value: "S" }, { text: "Globalisation and Cross-Cultural Communication", value: "A" }, { text: "E-commerce and the rise of the Gig Economy", value: "C" }, { text: "Renewable Energy and Sustainable Infrastructure", value: "V" }] },
+            { question: "How do you prefer to learn?", answers: [{ text: "Through structured research, reading, and experiments", value: "S" }, { text: "Through discussion, reading texts, and interpreting them", value: "A" }, { text: "Through case studies, internships, and market analysis", value: "C" }, { text: "Through apprenticeships, on-the-job training, and practice", value: "V" }] },
+            { question: "You see the best job opportunities in:", answers: [{ text: "Fields that require deep, specialized knowledge and research", value: "S" }, { text: "Roles that require strong communication and interpersonal skills", value: "A" }, { text: "Industries focused on finance, trade, and management", value: "C" }, { text: "Jobs that require specialized technical or trade skills", value: "V" }] },
+            { question: "What kind of team do you want to work with?", answers: [{ text: "A team of experts focused on data and accuracy", value: "S" }, { text: "A collaborative group focused on ideas and human impact", value: "A" }, { text: "A results-driven team focused on targets and growth", value: "C" }, { text: "A practical team that works together to build something tangible", value: "V" }] },
+            { question: "What is your primary goal in a career?", answers: [{ text: "To be an expert and pioneer in my field", value: "S" }, { text: "To have a stable job that contributes positively to society", value: "A" }, { text: "To achieve financial independence and leadership", value: "C" }, { text: "To master a craft and have reliable, skilled employment", value: "V" }] },
+            { question: "How important is a high starting salary to you?", answers: [{ text: "Less important than the opportunity for groundbreaking work.", value: "S" }, { text: "Less important than job satisfaction and making a difference.", value: "A" }, { text: "Very important, as it's a key measure of success.", value: "C" }, { text: "Moderately important, but skill development is the main goal.", value: "V" }] },
+            { question: "Which work-life balance scenario appeals most to you?", answers: [{ text: "Flexible hours, but may involve deep focus for long periods.", value: "S" }, { text: "A predictable 9-to-5 schedule, common in public sector jobs.", value: "A" }, { text: "Potentially long hours initially for high reward and career growth.", value: "C" }, { text: "Project-based work that might have irregular, but flexible hours.", value: "V" }] },
+            { question: "How do you define 'job security'?", answers: [{ text: "Being so specialized that your knowledge is always in demand.", value: "S" }, { text: "Working in a stable sector like education or government.", value: "A" }, { text: "Having strong financial and management skills applicable anywhere.", value: "C" }, { text: "Possessing a practical trade skill that is always needed.", value: "V" }] },
+            { question: "Ten years from now, you'd like to be:", answers: [{ text: "A respected expert or lead researcher in a technical field.", value: "S" }, { text: "In a senior role influencing policy, education, or culture.", value: "A" }, { text: "Running your own company or in a top management position.", value: "C" }, { text: "A master craftsman or a senior technical specialist.", value: "V" }] }
+        ];
+
+        // FIX: Restored the full streamData object
+        const streamData = {
+            Science: { description: "You have a curious and analytical mind. The Science stream is perfect for those who want to understand the world through experiments, logic, and reasoning.", courses: ["B.Sc. (Physics, Chemistry, Math, Biology, Computer Science)", "B.Tech/B.E. (Engineering)", "MBBS (Medicine)", "BCA (Computer Applications)"], careers: ["Scientist/Researcher", "Doctor/Engineer", "Software Developer", "Data Analyst", "Environmental Scientist"] },
+            Arts: { description: "You are creative, expressive, and interested in human society and culture. The Arts/Humanities stream offers a wide range of career options related to communication, public service, and creativity.", courses: ["B.A. (History, Political Science, English, Economics)", "Bachelor of Journalism", "Bachelor of Social Work (BSW)", "Bachelor of Fine Arts (BFA)"], careers: ["Civil Servant (IAS/IPS)", "Lawyer/Judge", "Teacher/Professor", "Journalist/Writer", "Social Worker"] },
+            Commerce: { description: "You have a knack for numbers, business, and management. The Commerce stream is ideal for aspiring entrepreneurs and those interested in the world of finance and trade.", courses: ["B.Com (Bachelor of Commerce)", "BBA (Bachelor of Business Administration)", "Chartered Accountancy (CA)", "Company Secretary (CS)"], careers: ["Accountant", "Bank Manager", "Financial Advisor", "Marketing Manager", "Entrepreneur"] },
+            Vocational: { description: "You are a practical, hands-on learner who enjoys acquiring specific skills. Vocational courses provide job-oriented training for technical fields.", courses: ["Diploma in Engineering (Polytechnic)", "ITI Courses (Electrician, Fitter, etc.)", "Diploma in Hotel Management", "Diploma in Computer Hardware & Networking"], careers: ["Electrician/Technician", "Web Designer", "Hotel Manager", "Automobile Mechanic", "Network Administrator"] }
+        };
+
+        let currentQuestionIndex = 0;
+        let scores = { S: 0, A: 0, C: 0, V: 0 };
+        let selectedAnswerValue = null;
+
+        startQuizBtn.addEventListener('click', startQuiz);
+        nextBtn.addEventListener('click', handleNextQuestion);
+        
+        // FIX: Restored all function implementations
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            scores = { S: 0, A: 0, C: 0, V: 0 };
+            startScreen.classList.add('hidden');
+            resultContainer.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            resetState();
+            const currentQuestion = questions[currentQuestionIndex];
+            questionText.innerText = currentQuestion.question;
+
+            currentQuestion.answers.forEach(answer => {
+                const button = document.createElement('button');
+                button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /></svg><span>${answer.text}</span>`;
+                button.classList.add('answer-btn', 'w-full', 'p-4', 'text-left', 'bg-white', 'rounded-lg', 'hover:bg-violet-50', 'hover:border-violet-500', 'border-2', 'border-gray-200', 'transition-all', 'duration-200', 'flex', 'items-center');
+                button.addEventListener('click', () => selectAnswer(button, answer.value));
+                answerButtons.appendChild(button);
+            });
+            updateProgressBar();
+            updatePaginationDots();
+        }
+        
+        function resetState() {
+            selectedAnswerValue = null;
+            nextBtn.disabled = true;
+            while (answerButtons.firstChild) {
+                answerButtons.removeChild(answerButtons.firstChild);
+            }
+        }
+        
+        function selectAnswer(selectedButton, value) {
+            Array.from(answerButtons.children).forEach(button => {
+                button.classList.remove('selected');
+                button.querySelector('svg').innerHTML = '<circle cx="12" cy="12" r="10" />';
+            });
+            selectedButton.classList.add('selected');
+            selectedButton.querySelector('svg').innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />';
+            selectedAnswerValue = value;
+            nextBtn.disabled = false;
+        }
+
+        function handleNextQuestion() {
+            if (selectedAnswerValue) {
+                scores[selectedAnswerValue]++;
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    showQuestion();
+                } else {
+                    showResult();
+                }
+            }
+        }
+
+        function updateProgressBar() {
+            const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            questionCounter.innerText = currentQuestionIndex + 1;
+        }
+
+        function updatePaginationDots() {
+            paginationDots.innerHTML = '';
+            for (let i = 0; i < questions.length; i++) {
+                const dot = document.createElement('span');
+                dot.classList.add('h-2', 'w-2', 'rounded-full', 'transition-colors', 'duration-300');
+                if (i === currentQuestionIndex) {
+                    dot.classList.add('bg-violet-600');
+                } else {
+                    dot.classList.add('bg-gray-300');
+                }
+                paginationDots.appendChild(dot);
+            }
+        }
+
+        function showResult() {
+            let currentCount = parseInt(localStorage.getItem('aajeevikaQuizCount') || '0', 10);
+            currentCount++;
+            localStorage.setItem('aajeevikaQuizCount', currentCount);
+
+            let maxScore = -1;
+            let recommendedStreamKey = '';
+            for (const stream in scores) {
+                if (scores[stream] > maxScore) {
+                    maxScore = scores[stream];
+                    recommendedStreamKey = stream;
+                }
+            }
+            const streamMap = { S: 'Science', A: 'Arts', C: 'Commerce', V: 'Vocational' };
+            const recommendedStreamName = streamMap[recommendedStreamKey];
+            localStorage.setItem('aajeevikaResultStream', recommendedStreamName);
+
+            quizContainer.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+
+            const data = streamData[recommendedStreamName];
+            resultStream.innerText = recommendedStreamName;
+            resultDescription.innerText = data.description;
+
+            courseList.innerHTML = '';
+            careerList.innerHTML = '';
+            data.courses.forEach(course => {
+                const li = document.createElement('li');
+                li.innerText = course;
+                courseList.appendChild(li);
+            });
+            data.careers.forEach(career => {
+                const li = document.createElement('li');
+                li.innerText = career;
+                careerList.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
