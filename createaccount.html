@@ -193,6 +193,12 @@
             color: #c4b5fd;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = 'https://weivnermtomqfhnrhulx.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndlaXZuZXJtdG9tcWZobnJodWx4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMDI2MjksImV4cCI6MjA3MzU3ODYyOX0.aszH4u_D1jboAlwKSu8HI68qqnVmwEjnjp8bsbUWj1M';
+        const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+    </script>
 </head>
 <body>
     <div class="stars"></div>
@@ -214,4 +220,46 @@
             </div>
             <button type="submit" class="cta-button primary">Create an Account</button>
         </form>
-        <p class="link-text">Already have an account? <a href="login.html">Log in here</a></p
+        <p class="link-text">Already have an account? <a href="login.html">Log in here</a></p>
+    </div>
+
+    <script>
+        // Step 2: Initialize Supabase client with your API keys
+        const supabaseUrl = 'YOUR_SUPABASE_PROJECT_URL';
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+        const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Step 3: Handle form submission
+        const form = document.querySelector('form');
+        const fullNameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const fullName = fullNameInput.value;
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        full_name: fullName,
+                    }
+                }
+            });
+
+            if (error) {
+                alert('Registration failed: ' + error.message);
+                console.error('Registration error:', error);
+            } else {
+                alert('Success! Please check your email for a confirmation link.');
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>
