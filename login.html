@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Otake Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink-light: #fce9f1;
+            --purple-light: #e6d3f7;
+            --purple-accent: #a855f7;
+            --yellow-accent: #ffeb3b;
+            --black-soft: #1a202c;
+            --gray-text: #4a5568;
+            --gray-light: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--pink-light), var(--purple-light));
+            animation: background-flow 20s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes background-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .login-card {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.05), -10px -10px 30px rgba(255, 255, 255, 0.8);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 15px 15px 40px rgba(0, 0, 0, 0.1), -15px -15px 40px rgba(255, 255, 255, 0.7);
+        }
+
+        .login-label {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--yellow-accent);
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--black-soft);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .welcome-heading {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--black-soft);
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-text);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 16px;
+            color: var(--black-soft);
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--purple-accent);
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+        }
+        
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: var(--gray-text);
+            margin-bottom: 30px;
+        }
+        
+        .options a {
+            color: var(--purple-accent);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .options a:hover {
+            color: #7c3aed;
+        }
+
+        .options input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        
+        .cta-button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        .cta-button.primary {
+            background-color: var(--black-soft);
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(26, 32, 44, 0.2);
+        }
+
+        .cta-button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26, 32, 44, 0.3);
+        }
+        
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 25px 0;
+            color: #a0aec0;
+        }
+
+        .separator::before, .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .separator:not(:empty)::before {
+            margin-right: .5em;
+        }
+
+        .separator:not(:empty)::after {
+            margin-left: .5em;
+        }
+        
+        .cta-button.google {
+            background-color: #fff;
+            color: var(--gray-text);
+            border: 1px solid var(--gray-light);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        }
+
+        .cta-button.google img {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+
+        .cta-button.google:hover {
+            background-color: #f7fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-label">Aajeevika Login</div>
+        <h1 class="welcome-heading">Welcome Aajeevika!</h1>
+        <form>
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" value="batuhankra312@gmail.co" />
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" value="••••••••" />
+            </div>
+            <div class="options">
+                <label>
+                    <input type="checkbox" checked /> Remember me
+                </label>
+                <a href="#">Forgot password?</a>
+            </div>
+            <button type="submit" class="cta-button primary">Create an Account</button>
+            <div class="separator"><span>or</span></div>
+            <button type="button" class="cta-button google">
+                <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png" alt="Google logo" />
+                Continue with Google
+            </button>
+        </form>
+    </div>
+</body>
+</html>

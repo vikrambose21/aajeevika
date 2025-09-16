@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aajeevika Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.22.5/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { margin: 0; font-family: 'Inter', sans-serif; background-color: #f9fafb; }
+    .dark-gradient { background: linear-gradient(180deg, #1f2937 0%, #374151 100%); }
+    .sidebar { transition: width 0.3s; }
+    .sidebar-collapsed { width: 60px; }
+    .sidebar-expanded { width: 250px; }
+    .main-content { transition: margin-left 0.3s; }
+    .card { background-color: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.07); }
+    .calendar-day { cursor: pointer; transition: background-color 0.2s; }
+    .calendar-day:hover { background-color: #f3f4f6; }
+    .calendar-day.today { background-color: #a5b4fc; color: white; font-weight: bold; }
+    .calendar-day.selected { background-color: #6366f1; color: white; }
+    .calendar-day.event::after { content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 6px; height: 6px; background-color: #4f46e5; border-radius: 50%; }
+    .calendar-day.selected.event::after { background-color: white; }
+    .tooltip { visibility: hidden; position: absolute; background-color: #1a202c; color: white; padding: 5px 10px; border-radius: 5px; z-index: 10; left: 70px; }
+    .sidebar-collapsed .nav-item:hover .tooltip { visibility: visible; }
+    .nav-item-active { background-color: #4b5563; }
+    .nav-item:hover { background-color: #374151; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const NavBar = ({ isSidebarCollapsed, toggleSidebar, activePage }) => {
+      const navItems = [
+        { name: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', href: 'dashboard.html' },
+        { name: 'Career Explorer', icon: 'M12 6.253v11.494m-9-5.747h18', href: 'career.html' },
+      
+        { name: 'My Profile', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2', href: '#' },
+        { name: 'Settings', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924-1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z', href: '#' },
+      ];
+
+      return (
+        <div className={`sidebar dark-gradient ${isSidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'} fixed top-0 left-0 h-screen text-white flex flex-col`}>
+          <div className="flex items-center justify-between p-4 flex-shrink-0">
+            {!isSidebarCollapsed && <h2 className="text-xl font-semibold">Aajeevika</h2>}
+            <button onClick={toggleSidebar} className="text-white focus:outline-none p-2 rounded-md hover:bg-gray-700"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg></button>
+          </div>
+          <nav className="flex-grow">
+            {navItems.map(item => (
+              <a key={item.name} href={item.href} className={`nav-item flex items-center p-4 relative rounded-md m-2 ${activePage === item.name ? 'nav-item-active' : ''}`} aria-label={item.name}>
+                <svg className="w-6 h-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon} /></svg>
+                {!isSidebarCollapsed && <span>{item.name}</span>}
+                {isSidebarCollapsed && <span className="tooltip">{item.name}</span>}
+              </a>
+            ))}
+          </nav>
+        </div>
+      );
+    };
+
+    const Header = () => (
+      <div className="bg-white flex justify-between items-center p-4 mb-6 rounded-xl shadow-sm">
+        <h1 className="text-2xl font-bold text-gray-800">Welcome back, John! 👋</h1>
+        <div className="flex items-center space-x-4">
+          <input type="text" placeholder="Search..." className="border rounded-lg p-2 w-48 bg-gray-50 text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+          <div className="flex items-center">
+            <img src="pfp.jpg" alt="Profile" className="w-10 h-10 rounded-full" />
+          </div>
+        </div>
+      </div>
+    );
+
+    const SummaryReport = () => {
+      const [quizCount, setQuizCount] = useState(0);
+      useEffect(() => {
+        const count = localStorage.getItem('aajeevikaQuizCount') || 0;
+        setQuizCount(parseInt(count, 10));
+      }, []);
+
+      const summaryData = [
+        { title: 'Career Paths Explored', value: '4', desc: 'Dive deeper!', icon: 'M12 6.253v11.494m-9-5.747h18' },
+        { title: 'Quizzes Taken', value: quizCount, desc: 'Retake anytime.', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
+        { title: 'Events Attended', value: '0', desc: 'Check the calendar!', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
+        { title: 'Interest Evaluation', value: '75%', desc: 'Based on quiz results.', icon: 'M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z' },
+      ];
+
+      return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          {summaryData.map(item => (
+            <div className="card p-5 flex items-start space-x-4" key={item.title}>
+              <div className="bg-indigo-100 p-3 rounded-full"><svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon} /></svg></div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-500">{item.title}</h3>
+                <p className="text-2xl font-bold text-gray-800 mt-1">{item.value}</p>
+                <p className="text-xs text-gray-400 mt-1">{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    };
+    
+    const CareerFinderCTA = () => (
+      <div className="p-6 rounded-xl mb-6 text-white" style={{background: 'linear-gradient(90deg, #6366f1, #a855f7)'}}>
+          <div className="flex flex-col md:flex-row justify-between items-center">
+              <div><h2 className="text-2xl font-bold">Unsure About Your Future?</h2><p className="mt-1">Our CareerFinder quiz can help you discover your strengths and passions.</p></div>
+              <a href="aptitude.html" className="mt-4 md:mt-0 bg-white text-indigo-600 font-bold py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors duration-300 shadow-md">Take me to the CareerFinder Quiz</a>
+          </div>
+      </div>
+    );
+
+    const Calendar = () => {
+      const today = new Date(2025, 8, 9);
+      const [currentMonth, setCurrentMonth] = useState(new Date(today.getFullYear(), today.getMonth()));
+      const [selectedDate, setSelectedDate] = useState(today);
+
+      const events = {
+        '2025-09-12': ['UPSC Civil Services - Awareness Session', '11:00 AM'],
+        '2025-09-18': ['Tamil Nadu Skill Development Mission - Webinar', '2:00 PM'],
+        '2025-09-25': ['Digital India Week - Student Conclave', '10:00 AM'],
+      };
+      
+      const handleDayClick = (day) => {
+        setSelectedDate(new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day));
+      };
+      
+      const renderCalendarDays = () => {
+        const year = currentMonth.getFullYear();
+        const month = currentMonth.getMonth();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const firstDayOfMonth = new Date(year, month, 1).getDay();
+        const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+        const emptyDays = Array.from({ length: (firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1) });
+        
+        return [...emptyDays.map((_, i) => <div key={`empty-${i}`} />), ...days.map(day => {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+            const isSelected = day === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear();
+            const hasEvent = events[dateStr];
+            return (
+              <div key={day} onClick={() => handleDayClick(day)} className={`calendar-day p-2 text-center rounded-lg text-gray-800 ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasEvent ? 'event' : ''}`}>
+                {day}
+              </div>
+            );
+        })];
+      };
+
+      const prevMonth = () => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
+      const nextMonth = () => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
+
+      const selectedDateString = selectedDate.toISOString().split('T')[0];
+      const eventForSelectedDay = events[selectedDateString];
+
+      return (
+        <div className="card p-4 h-full">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-800">My Schedule</h3>
+            <div className="flex items-center space-x-2 text-gray-600">
+              <button onClick={prevMonth} className="p-1 rounded-full hover:bg-gray-100">&lt;</button>
+              <span className="font-medium">{currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
+              <button onClick={nextMonth} className="p-1 rounded-full hover:bg-gray-100">&gt;</button>
+            </div>
+          </div>
+          <div className="grid grid-cols-7 gap-2 text-center">
+            {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(day => (
+              <div key={day} className="text-sm font-medium text-gray-500">{day}</div>
+            ))}
+            {renderCalendarDays()}
+          </div>
+          <div className="mt-4 pt-4 border-t border-gray-100">
+             <h4 className="font-semibold text-gray-700">Events for {selectedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'long' })}:</h4>
+             {eventForSelectedDay ? (
+                 <div className="flex justify-between text-sm text-gray-600 mt-2 bg-indigo-50 p-3 rounded-lg">
+                    <span>{eventForSelectedDay[0]}</span>
+                    <span className="font-semibold text-indigo-600">{eventForSelectedDay[1]}</span>
+                </div>
+             ) : (
+                <p className="text-sm text-gray-500 mt-2">No events scheduled for this day.</p>
+             )}
+          </div>
+        </div>
+      );
+    };
+
+    const CareerMentors = () => (
+      <div className="card p-4">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Career Mentors</h3>
+        <div className="space-y-4">
+          <div className="flex items-center">
+            <img src="pfp.jpg" alt="Mentor" className="w-10 h-10 rounded-full mr-3" />
+            <div>
+              <p className="text-sm font-medium text-gray-800">Anjali Rao</p>
+              <p className="text-xs text-indigo-500">UPSC Exam Mentor</p>
+            </div>
+          </div>
+          <div className="flex items-center">
+            <img src="pfp.jpg" alt="Mentor" className="w-10 h-10 rounded-full mr-3" />
+            <div>
+              <p className="text-sm font-medium text-gray-800">Vikram Singh</p>
+              <p className="text-xs text-indigo-500">Tech Career Advisor</p>
+            </div>
+          </div>
+          <div className="flex items-center">
+            <img src="pfp.jpg" alt="Mentor" className="w-10 h-10 rounded-full mr-3" />
+            <div>
+              <p className="text-sm font-medium text-gray-800">Ravi Kumar</p>
+              <p className="text-xs text-indigo-500">Commerce & Finance Expert</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
+    const UpcomingEvents = () => (
+      <div className="card p-4">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-gray-800">Upcoming Events</h3>
+          <a href="#" className="text-sm text-indigo-600 hover:underline">See All</a>
+        </div>
+        <div className="space-y-4">
+          <a href="#" className="block hover:bg-gray-50 rounded-lg p-2 -m-2">
+            <div className="flex items-center">
+              <div className="w-10 h-10 rounded-lg mr-3 bg-blue-100 flex items-center justify-center font-bold text-blue-600 text-xs">12 SEP</div>
+              <div>
+                <p className="text-sm font-medium text-gray-800">UPSC Civil Services - Awareness Session</p>
+                <p className="text-xs text-gray-500">Online Webinar</p>
+              </div>
+            </div>
+          </a>
+          <a href="#" className="block hover:bg-gray-50 rounded-lg p-2 -m-2">
+            <div className="flex items-center">
+                <div className="w-10 h-10 rounded-lg mr-3 bg-green-100 flex items-center justify-center font-bold text-green-600 text-xs">18 SEP</div>
+              <div>
+                <p className="text-sm font-medium text-gray-800">Tamil Nadu Skill Development Mission</p>
+                <p className="text-xs text-gray-500">Online Webinar</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    );
+    
+    const Dashboard = () => {
+      const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+      const toggleSidebar = () => setIsSidebarCollapsed(!isSidebarCollapsed);
+
+      return (
+        <div>
+          <NavBar isSidebarCollapsed={isSidebarCollapsed} toggleSidebar={toggleSidebar} activePage="Dashboard" />
+          <div className={`main-content bg-gray-50 ${isSidebarCollapsed ? 'ml-[60px]' : 'ml-[250px]'} p-6 min-h-screen`}>
+            <Header />
+            <SummaryReport />
+            <CareerFinderCTA />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+              <div className="lg:col-span-2">
+                <Calendar />
+              </div>
+              <div className="space-y-6">
+                <CareerMentors />
+                <UpcomingEvents />
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<Dashboard />);
+  </script>
+</body>
+</html>

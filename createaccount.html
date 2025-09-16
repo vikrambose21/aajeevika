@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --text-color: #e2e8f0;
+            --input-bg: rgba(255, 255, 255, 0.1);
+            --input-border: rgba(255, 255, 255, 0.2);
+            --primary-button-bg: #8b5cf6;
+            --primary-button-hover: #7c3aed;
+            --link-color: #a78bfa;
+            --separator-color: rgba(255, 255, 255, 0.3);
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #000;
+            color: var(--text-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50px 100px, #ddd, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, #eee, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 150px 120px, #ddd, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 180px 80px, #fff, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: stars-move 120s linear infinite;
+        }
+
+        @keyframes stars-move {
+            from { background-position: 0 0; }
+            to { background-position: 200px 200px; }
+        }
+        
+        .auth-card {
+            background-color: rgba(25, 25, 30, 0.7);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            font-size: 16px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-button-bg);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+        }
+
+        .cta-button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        .cta-button.primary {
+            background-color: var(--primary-button-bg);
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.2);
+        }
+
+        .cta-button.primary:hover {
+            transform: translateY(-2px);
+            background-color: var(--primary-button-hover);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+        }
+        
+        .cta-button.google {
+            background-color: #fff;
+            color: #000;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cta-button.google img {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+        
+        .cta-button.google:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 25px 0;
+            color: var(--separator-color);
+        }
+
+        .separator::before, .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--separator-color);
+        }
+
+        .separator:not(:empty)::before { margin-right: .5em; }
+        .separator:not(:empty)::after { margin-left: .5em; }
+
+        .link-text {
+            font-size: 14px;
+            color: var(--text-color);
+            margin-top: 20px;
+        }
+        
+        .link-text a {
+            color: var(--link-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .link-text a:hover {
+            color: #c4b5fd;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="auth-card">
+        <h1 class="title">Create Account</h1>
+        <p class="subtitle">Join Aajeevika and find your career path.</p>
+        <form>
+            <div class="input-group">
+                <label for="username">Full Name</label>
+                <input type="text" id="username" placeholder="John Doe" />
+            </div>
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="you@example.com" />
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="••••••••" />
+            </div>
+            <button type="submit" class="cta-button primary">Create an Account</button>
+            <div class="separator"><span>or</span></div>
+            <button type="button" class="cta-button google">
+                <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png" alt="Google logo" />
+                Continue with Google
+            </button>
+        </form>
+        <p class="link-text">Already have an account? <a href="login.html">Log in here</a></p>
+    </div>
+</body>
+</html>
