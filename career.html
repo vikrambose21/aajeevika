@@ -15,12 +15,14 @@
     .sidebar-collapsed { width: 60px; }
     .sidebar-expanded { width: 250px; }
     .main-content { transition: margin-left 0.3s; }
-    .card { background-color: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; }
+    .card { background-color: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; cursor: pointer; }
     .card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.07); }
     .tooltip { visibility: hidden; position: absolute; background-color: #1a202c; color: white; padding: 5px 10px; border-radius: 5px; z-index: 10; left: 70px; }
     .sidebar-collapsed .nav-item:hover .tooltip { visibility: visible; }
     .nav-item-active { background-color: #4b5563; }
     .nav-item:hover { background-color: #374151; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 50; }
+    .modal-content { background: white; padding: 24px; border-radius: 12px; max-width: 600px; max-height: 80vh; overflow-y: auto; position: relative; }
   </style>
 </head>
 <body>
@@ -31,7 +33,7 @@
 
     const NavBar = ({ isSidebarCollapsed, toggleSidebar, activePage }) => {
       const navItems = [
-        { name: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', href: 'index.html' },
+        { name: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', href: 'dashboard.html' },
         { name: 'Career Analysis', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4', href: 'career.html' },
         { name: 'Mentors', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', href: '#' },
         { name: 'My Profile', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2', href: '#' },
@@ -69,10 +71,58 @@
       </div>
     );
     
-    // Data for 25 colleges in India
+    // Data for 50 colleges in India, expanded to include all streams
     const allColleges = [
-      { id: 1, name: "Indian Institute of Technology (IIT)", location: "Delhi", courses: ["B.Tech (CSE)", "B.Tech (EE)", "B.Tech (Mech)"], url: "https://home.iitd.ac.in/", type: "Government" }, { id: 2, name: "Indian Institute of Technology (IIT)", location: "Bombay", courses: ["B.Tech (CSE)", "B.Tech (Aero)", "B.Des"], url: "https://www.iitb.ac.in/", type: "Government" }, { id: 3, name: "Indian Institute of Technology (IIT)", location: "Madras", courses: ["B.Tech (CSE)", "B.Tech (Naval)", "M.Sc"], url: "https://www.iitm.ac.in/", type: "Government" }, { id: 4, name: "Indian Institute of Science (IISc)", location: "Bangalore", courses: ["B.Sc (Research)", "M.Sc", "Ph.D"], url: "https://www.iisc.ac.in/", type: "Government" }, { id: 5, name: "All India Institute of Medical Sciences (AIIMS)", location: "Delhi", courses: ["MBBS", "MD", "MS"], url: "https://www.aiims.edu/", type: "Government" }, { id: 6, name: "JIPMER", location: "Puducherry", courses: ["MBBS", "MD", "B.Sc (Nursing)"], url: "https://www.jipmer.edu.in/", type: "Government" }, { id: 7, name: "National Institute of Technology (NIT)", location: "Trichy", courses: ["B.Tech (CSE)", "B.Tech (ECE)", "B.Arch"], url: "https://www.nitt.edu/", type: "Government" }, { id: 8, name: "National Institute of Technology (NIT)", location: "Surathkal", courses: ["B.Tech (IT)", "B.Tech (Mining)", "B.Tech (Chem)"], url: "https://www.nitk.ac.in/", type: "Government" }, { id: 9, name: "Delhi University (DU)", location: "Delhi", courses: ["B.A. (Hons)", "B.Sc", "B.Com"], url: "https://www.du.ac.in/", type: "Government" }, { id: 10, name: "Jawaharlal Nehru University (JNU)", location: "Delhi", courses: ["M.A.", "M.Phil", "Ph.D"], url: "https://www.jnu.ac.in/", type: "Government" }, { id: 11, name: "University of Hyderabad", location: "Hyderabad", courses: ["M.A. (Soc)", "M.Sc (Phy)", "Ph.D"], url: "https://www.uohyd.ac.in/", type: "Government" }, { id: 12, name: "NALSAR University of Law", location: "Hyderabad", courses: ["B.A. LLB", "LL.M"], url: "https://www.nalsar.ac.in/", type: "Government" }, { id: 13, name: "Indian Institute of Management (IIM)", location: "Ahmedabad", courses: ["MBA", "PGP"], url: "https://www.iima.ac.in/", type: "Government" }, { id: 14, name: "Indian Institute of Management (IIM)", location: "Bangalore", courses: ["MBA", "PGPEM"], url: "https://www.iimb.ac.in/", type: "Government" }, { id: 15, name: "National Law School of India University (NLSIU)", location: "Bangalore", courses: ["B.A. LLB (Hons)", "LL.M", "Ph.D"], url: "https://www.nls.ac.in/", type: "Government" },
-      { id: 16, name: "Vellore Institute of Technology (VIT)", location: "Vellore", courses: ["B.Tech (CSE)", "B.Tech (IT)", "MCA"], url: "https://vit.ac.in/", type: "Private" }, { id: 17, name: "BITS Pilani", location: "Pilani", courses: ["B.E. (Hons)", "M.Sc", "M.E."], url: "https://www.bits-pilani.ac.in/", type: "Private" }, { id: 18, name: "Manipal Academy of Higher Education", location: "Manipal", courses: ["MBBS", "B.Tech", "BBA"], url: "https://www.manipal.edu/", type: "Private" }, { id: 19, name: "Amity University", location: "Noida", courses: ["B.Tech", "MBA", "B.A. LLB"], url: "https://www.amity.edu/", type: "Private" }, { id: 20, name: "SRM Institute of Science and Technology", location: "Chennai", courses: ["B.Tech", "M.Tech", "B.Sc"], url: "https://www.srmist.edu.in/", type: "Private" }, { id: 21, name: "Symbiosis International University", location: "Pune", courses: ["BBA", "MBA", "B.A. (Media)"], url: "https://www.siu.edu.in/", type: "Private" }, { id: 22, name: "Ashoka University", location: "Sonipat", courses: ["B.A. (Hons)", "B.Sc (Hons)", "Ph.D"], url: "https://www.ashoka.edu.in/", type: "Private" }, { id: 23, name: "Kalinga Institute of Industrial Technology (KIIT)", location: "Bhubaneswar", courses: ["B.Tech", "M.Tech", "MBBS"], url: "https://kiit.ac.in/", type: "Private" }, { id: 24, name: "Thapar Institute of Engineering & Technology", location: "Patiala", courses: ["B.E.", "M.E.", "MCA"], url: "https://www.thapar.edu/", type: "Private" }, { id: 25, name: "Shiv Nadar University", location: "Greater Noida", courses: ["B.Tech", "B.A. (Research)", "MBA"], url: "https://snu.edu.in/", type: "Private" }
+      { id: 1, name: "Indian Institute of Technology (IIT)", location: "Delhi", courses: ["B.Tech (CSE)", "B.Tech (EE)", "M.Sc"], stream: "Science", url: "https://home.iitd.ac.in/", type: "Government", rationale: "IIT Delhi is a premier engineering institution known for its rigorous curriculum and cutting-edge research. It's ideal for students with strong analytical and problem-solving skills who want to pursue a career in technology or academia." }, 
+      { id: 2, name: "Indian Institute of Technology (IIT)", location: "Bombay", courses: ["B.Tech (CSE)", "B.Tech (Aero)", "B.Des"], stream: "Science", url: "https://www.iitb.ac.in/", type: "Government", rationale: "IIT Bombay offers a world-class education in engineering and design. The institute's strong industry connections and innovative environment make it a top choice for aspiring engineers and innovators." }, 
+      { id: 3, name: "Indian Institute of Technology (IIT)", location: "Madras", courses: ["B.Tech (CSE)", "B.Tech (Naval)", "M.Sc"], stream: "Science", url: "https://www.iitm.ac.in/", type: "Government", rationale: "IIT Madras is renowned for its technical expertise and high-quality faculty. Its focus on research and development provides a solid foundation for a career in science and technology." }, 
+      { id: 4, name: "Indian Institute of Science (IISc)", location: "Bangalore", courses: ["B.Sc (Research)", "M.Sc", "Ph.D"], stream: "Science", url: "https://www.iisc.ac.in/", type: "Government", rationale: "As one of India's leading institutions for scientific research and education, IISc is perfect for those passionate about a career in research or academia." }, 
+      { id: 5, name: "All India Institute of Medical Sciences (AIIMS)", location: "Delhi", courses: ["MBBS", "MD", "MS"], stream: "Science", url: "https://www.aiims.edu/", type: "Government", rationale: "AIIMS Delhi is the top medical college in India, offering exceptional training and clinical exposure. It is the best choice for students who want to become doctors and serve the nation." }, 
+      { id: 6, name: "JIPMER", location: "Puducherry", courses: ["MBBS", "MD", "B.Sc (Nursing)"], stream: "Science", url: "https://www.jipmer.edu.in/", type: "Government", rationale: "JIPMER provides quality medical education with a strong emphasis on practical training. It is a highly respected institution for a career in healthcare." }, 
+      { id: 7, name: "National Institute of Technology (NIT)", location: "Trichy", courses: ["B.Tech (CSE)", "B.Tech (ECE)", "B.Arch"], stream: "Science", url: "https://www.nitt.edu/", type: "Government", rationale: "NIT Trichy is a well-regarded engineering college known for its robust curriculum and excellent placement record. A great option for aspiring engineers." }, 
+      { id: 8, name: "National Institute of Technology (NIT)", location: "Surathkal", courses: ["B.Tech (IT)", "B.Tech (Mining)", "B.Tech (Chem)"], stream: "Science", url: "https://www.nitk.ac.in/", type: "Government", rationale: "NIT Surathkal offers a diverse range of engineering programs with a strong focus on technical education and industry-relevant skills. It's a solid choice for a career in engineering." }, 
+      { id: 9, name: "Delhi University (DU)", location: "Delhi", courses: ["B.A. (Hons)", "B.Sc (Hons)", "B.Com (Hons)"], stream: "Arts", url: "https://www.du.ac.in/", type: "Government", rationale: "DU is a central university with a wide array of Arts and Humanities courses. Its vibrant campus life and academic freedom make it a great place for creative and analytical minds." }, 
+      { id: 10, name: "Jawaharlal Nehru University (JNU)", location: "Delhi", courses: ["M.A. (Sociology)", "M.Phil (History)", "Ph.D"], stream: "Arts", url: "https://www.jnu.ac.in/", type: "Government", rationale: "JNU is a hub for social sciences and humanities. The university is known for its critical thinking and research-oriented approach, making it ideal for civil services or academia." }, 
+      { id: 11, name: "University of Hyderabad", location: "Hyderabad", courses: ["M.A. (Economics)", "M.A. (Pol Sci)", "Ph.D"], stream: "Arts", url: "https://www.uohyd.ac.in/", type: "Government", rationale: "The University of Hyderabad is a top-tier institution for social sciences, offering a research-intensive environment perfect for those interested in public policy or research." }, 
+      { id: 12, name: "NALSAR University of Law", location: "Hyderabad", courses: ["B.A. LLB (Hons)", "LL.M"], stream: "Arts", url: "https://www.nalsar.ac.in/", type: "Government", rationale: "NALSAR is one of the best law schools in India. It provides a comprehensive legal education, preparing students for careers in law, public policy, and corporate law." }, 
+      { id: 13, name: "Indian Institute of Management (IIM)", location: "Ahmedabad", courses: ["MBA", "PGP"], stream: "Commerce", url: "https://www.iima.ac.in/", type: "Government", rationale: "IIM Ahmedabad is the top management institution in India. It offers a challenging and rewarding curriculum for aspiring business leaders and entrepreneurs." }, 
+      { id: 14, name: "Indian Institute of Management (IIM)", location: "Bangalore", courses: ["MBA", "PGPEM"], stream: "Commerce", url: "https://www.iimb.ac.in/", type: "Government", rationale: "IIM Bangalore is a highly-ranked management school with a strong focus on innovation and leadership. A great choice for those aiming for a career in business or finance." }, 
+      { id: 15, name: "National Law School of India University (NLSIU)", location: "Bangalore", courses: ["B.A. LLB (Hons)", "LL.M", "Ph.D"], stream: "Arts", url: "https://www.nls.ac.in/", type: "Government", rationale: "NLSIU is a premier law institution that offers an excellent legal education. A great option for students aspiring to become lawyers, judges, or civil servants." },
+      { id: 16, name: "Vellore Institute of Technology (VIT)", location: "Vellore", courses: ["B.Tech (CSE)", "B.Tech (IT)", "MCA"], stream: "Science", url: "https://vit.ac.in/", type: "Private", rationale: "VIT is a private university known for its flexible academic system and state-of-the-art facilities. It offers a wide range of technical courses." }, 
+      { id: 17, name: "BITS Pilani", location: "Pilani", courses: ["B.E. (Hons)", "M.Sc", "M.E."], stream: "Science", url: "https://www.bits-pilani.ac.in/", type: "Private", rationale: "BITS Pilani is a top-ranked private engineering and science institute with a reputation for academic excellence and innovation." }, 
+      { id: 18, name: "Manipal Academy of Higher Education", location: "Manipal", courses: ["MBBS", "B.Tech", "BBA"], stream: "Science", url: "https://www.manipal.edu/", type: "Private", rationale: "Manipal offers a diverse range of medical, engineering, and business courses. It has a global reputation and provides a holistic education." }, 
+      { id: 19, name: "Amity University", location: "Noida", courses: ["B.Tech", "BBA", "B.A. LLB"], stream: "Science", url: "https://www.amity.edu/", type: "Private", rationale: "Amity University is a large private university offering many courses across multiple disciplines. It is known for its modern campus and industry connections." }, 
+      { id: 20, name: "SRM Institute of Science and Technology", location: "Chennai", courses: ["B.Tech", "M.Tech", "B.Sc"], stream: "Science", url: "https://www.srmist.edu.in/", type: "Private", rationale: "SRM is a popular private engineering and technology institute that offers a wide range of academic programs and research opportunities." }, 
+      { id: 21, name: "Symbiosis International University", location: "Pune", courses: ["BBA", "MBA", "B.A. (Media)"], stream: "Commerce", url: "https://www.siu.edu.in/", type: "Private", rationale: "Symbiosis is well-regarded for its management and media programs. It offers a global perspective and strong industry placements." }, 
+      { id: 22, name: "Ashoka University", location: "Sonipat", courses: ["B.A. (Hons)", "B.Sc (Hons)", "Ph.D"], stream: "Arts", url: "https://www.ashoka.edu.in/", type: "Private", rationale: "Ashoka University focuses on a liberal arts education, encouraging critical thinking and interdisciplinary learning. It's a great option for those interested in social sciences and humanities." }, 
+      { id: 23, name: "Kalinga Institute of Industrial Technology (KIIT)", location: "Bhubaneswar", courses: ["B.Tech", "M.Tech", "MBBS"], stream: "Science", url: "https://kiit.ac.in/", type: "Private", rationale: "KIIT is a private university known for its wide range of professional courses and modern infrastructure." }, 
+      { id: 24, name: "Thapar Institute of Engineering & Technology", location: "Patiala", courses: ["B.E.", "M.E.", "MCA"], stream: "Science", url: "https://www.thapar.edu/", type: "Private", rationale: "Thapar Institute has a long-standing reputation for its engineering programs and strong academic standards." }, 
+      { id: 25, name: "Shiv Nadar University", location: "Greater Noida", courses: ["B.Tech", "B.A. (Research)", "MBA"], stream: "Science", url: "https://snu.edu.in/", type: "Private", rationale: "Shiv Nadar University offers a research-driven environment and a diverse curriculum, making it an excellent choice for a well-rounded education." },
+      { id: 26, name: "Christ University", location: "Bangalore", courses: ["B.A. (Psychology)", "B.Com (Hons)", "BCA"], stream: "Arts", url: "https://christuniversity.in/", type: "Private", rationale: "Christ University is known for its strict discipline and excellent academic standards in various fields, especially Commerce and Arts." },
+      { id: 27, name: "St. Xavier's College", location: "Kolkata", courses: ["B.A. (Sociology)", "B.Sc (Economics)", "B.Com"], stream: "Arts", url: "https://www.sxccal.edu/", type: "Private", rationale: "St. Xavier's offers a prestigious Arts and Commerce education with a focus on holistic development and social responsibility." },
+      { id: 28, name: "Lala Lajpat Rai Institute of Management", location: "Mumbai", courses: ["BMS", "MBA"], stream: "Commerce", url: "https://www.llrim.in/", type: "Vocational", rationale: "This institute specializes in job-oriented management programs, providing practical skills for a career in business and administration." },
+      { id: 29, name: "Indian Institute of Mass Communication", location: "Delhi", courses: ["PG Diploma in Journalism", "Radio & TV"], stream: "Arts", url: "https://www.iimc.nic.in/", type: "Government", rationale: "IIMC is the top college for mass communication and journalism, offering practical training and excellent industry connections." },
+      { id: 30, name: "National Institute of Design (NID)", location: "Ahmedabad", courses: ["B.Des", "M.Des"], stream: "Vocational", url: "https://www.nid.edu/", type: "Government", rationale: "NID is a premier design institute, offering hands-on, project-based learning for creative students. Ideal for careers in design, fashion, and media." },
+      { id: 31, name: "Indian Institute of Hotel Management", location: "Delhi", courses: ["B.Sc in Hotel Mgt", "Diploma in Culinary Arts"], stream: "Vocational", url: "https://www.ihm-delhi.org/", type: "Government", rationale: "IHM Delhi provides practical, skill-based training for the hospitality industry, ensuring students are job-ready upon graduation." },
+      { id: 32, name: "All India Institute of Ayurveda", location: "Delhi", courses: ["BAMS", "M.D. Ayurveda"], stream: "Science", url: "https://aiia.gov.in/", type: "Government", rationale: "For students interested in traditional medicine, this institute offers a comprehensive curriculum in Ayurveda with a focus on clinical practice." },
+      { id: 33, name: "Indian Institute of Science Education and Research (IISER)", location: "Pune", courses: ["BS-MS Dual Degree"], stream: "Science", url: "https://www.iiserpune.ac.in/", type: "Government", rationale: "IISERs are leading research institutes focusing on integrated science education. Perfect for those who want to combine a Bachelor's and Master's degree in science." },
+      { id: 34, name: "Lady Shri Ram College for Women", location: "Delhi", courses: ["B.A. (Hons) Pol Sci", "B.Com (Hons)"], stream: "Arts", url: "https://lsr.edu.in/", type: "Government", rationale: "LSR is a top-ranked Arts college known for its academic excellence and empowering environment for women." },
+      { id: 35, name: "Shaheed Sukhdev College of Business Studies", location: "Delhi", courses: ["BMS", "BBA"], stream: "Commerce", url: "https://sscbs.du.ac.in/", type: "Government", rationale: "SSCBS is a leading college for business studies, providing a strong foundation for a career in management and finance." },
+      { id: 36, name: "Indian Statistical Institute", location: "Kolkata", courses: ["B.Stat (Hons)", "M.Stat"], stream: "Science", url: "https://www.isical.ac.in/", type: "Government", rationale: "ISI is a premier institute for statistics and data science, offering a rigorous curriculum for students interested in a career in research or data analysis." },
+      { id: 37, name: "Indian Institute of Foreign Trade (IIFT)", location: "Delhi", courses: ["MBA (IB)"], stream: "Commerce", url: "https://www.iift.ac.in/", type: "Government", rationale: "IIFT is a specialized institute for international business, providing students with the skills needed to succeed in global trade and commerce." },
+      { id: 38, name: "Institute of Chartered Financial Analysts of India (ICFAI)", location: "Hyderabad", courses: ["B.Com", "BBA"], stream: "Commerce", url: "https://www.icfaiuniversity.in/", type: "Private", rationale: "ICFAI offers various programs in finance and management, with a strong focus on practical, industry-oriented learning." },
+      { id: 39, name: "Narsee Monjee Institute of Management Studies", location: "Mumbai", courses: ["MBA", "B.Tech"], stream: "Commerce", url: "https://www.nmims.edu/", type: "Private", rationale: "NMIMS is a well-known private university for management and technology, offering a diverse range of programs with good placements." },
+      { id: 40, name: "Birla Institute of Technology (BIT)", location: "Mesra", courses: ["B.Tech", "B.Arch"], stream: "Science", url: "https://www.bitmesra.ac.in/", type: "Private", rationale: "BIT Mesra is a reputable engineering college known for its strong technical education and research facilities." },
+      { id: 41, name: "International Institute of Information Technology (IIIT)", location: "Hyderabad", courses: ["B.Tech (CSE)", "B.Tech (ECE)"], stream: "Science", url: "https://www.iiit.ac.in/", type: "Private", rationale: "IIIT Hyderabad is a top-tier technology institute with a strong focus on computer science and research." },
+      { id: 42, name: "National Institute of Fashion Technology (NIFT)", location: "Delhi", courses: ["B.Des (Fashion)", "B.F.Tech"], stream: "Vocational", url: "https://nift.ac.in/", type: "Government", rationale: "NIFT is India's leading institution for fashion design and technology. It provides specialized training and is a great choice for creative careers." },
+      { id: 43, name: "Film and Television Institute of India (FTII)", location: "Pune", courses: ["Diploma in Film Direction"], stream: "Vocational", url: "http://www.ftiindia.com/", type: "Government", rationale: "FTII is a premier film and television institute, offering hands-on training for aspiring filmmakers, actors, and technicians." },
+      { id: 44, name: "Indian Institute of Handloom Technology", location: "Varanasi", courses: ["Diploma in Handloom"], stream: "Vocational", url: "http://www.iihtvaranasi.edu.in/", type: "Government", rationale: "This institute provides specialized training in handloom technology, preserving traditional skills and providing vocational opportunities." },
+      { id: 45, name: "National Institute of Mental Health and Neuro-Sciences (NIMHANS)", location: "Bangalore", courses: ["M.Sc (Psychiatric Nursing)"], stream: "Science", url: "https://nimhans.ac.in/", type: "Government", rationale: "NIMHANS is a leading institution for mental health and neuroscience, offering specialized courses for students interested in psychology and psychiatry." },
+      { id: 46, name: "Delhi College of Arts & Commerce", location: "Delhi", courses: ["B.A. (Hons)", "B.Com (Hons)"], stream: "Arts", url: "https://www.dcc.du.ac.in/", type: "Government", rationale: "DCAC is a well-known college under Delhi University, offering quality education in Commerce and Arts." },
+      { id: 47, name: "National Institute of Construction Management and Research (NICMAR)", location: "Pune", courses: ["PGP in Construction Mgt"], stream: "Vocational", url: "https://www.nicmar.ac.in/", type: "Private", rationale: "NICMAR is a specialized institute for construction management, providing practical training and industry-specific skills." },
+      { id: 48, name: "Institute of Financial Management and Research (IFMR)", location: "Chennai", courses: ["MBA"], stream: "Commerce", url: "https://www.ifmr.ac.in/", type: "Private", rationale: "IFMR is a top-ranked business school known for its rigorous curriculum and focus on financial management." },
+      { id: 49, name: "KJ Somaiya Institute of Management Studies and Research", location: "Mumbai", courses: ["MBA"], stream: "Commerce", url: "https://somaiya.edu/simsr/", type: "Private", rationale: "KJ Somaiya is a well-regarded management institute that provides a holistic education with a focus on both academic and co-curricular activities." },
+      { id: 50, name: "National Institute of Tourism and Hospitality Management", location: "Hyderabad", courses: ["MBA (Tourism)"], stream: "Vocational", url: "https://www.nithm.ac.in/", type: "Government", rationale: "This institute provides specialized vocational training in tourism and hospitality management, preparing students for careers in the travel industry." }
     ];
 
     const allLocations = [...new Set(allColleges.map(c => c.location))].sort();
@@ -81,17 +131,28 @@
       const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
       const toggleSidebar = () => setIsSidebarCollapsed(!isSidebarCollapsed);
 
-      // State management for filters
       const [searchTerm, setSearchTerm] = useState('');
       const [selectedLocations, setSelectedLocations] = useState([]);
       const [selectedType, setSelectedType] = useState('All');
+      const [selectedStream, setSelectedStream] = useState('All');
+      const [modalCollege, setModalCollege] = useState(null);
+      const [quizRecommendedStream, setQuizRecommendedStream] = useState(null);
+
+      useEffect(() => {
+        const stream = localStorage.getItem('aajeevikaResultStream');
+        if (stream) {
+          setQuizRecommendedStream(stream);
+          setSelectedStream(stream); // Pre-select the filter based on quiz result
+        }
+      }, []);
       
       const filteredColleges = allColleges.filter(college => {
         const matchesSearch = college.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                               college.courses.some(course => course.toLowerCase().includes(searchTerm.toLowerCase()));
         const matchesLocation = selectedLocations.length === 0 || selectedLocations.includes(college.location);
         const matchesType = selectedType === 'All' || college.type === selectedType;
-        return matchesSearch && matchesLocation && matchesType;
+        const matchesStream = selectedStream === 'All' || college.stream === selectedStream;
+        return matchesSearch && matchesLocation && matchesType && matchesStream;
       });
 
       const handleLocationToggle = (location) => {
@@ -108,9 +169,20 @@
         setSearchTerm('');
         setSelectedLocations([]);
         setSelectedType('All');
+        setSelectedStream('All');
+        setQuizRecommendedStream(null);
+        localStorage.removeItem('aajeevikaResultStream');
+      };
+
+      const openModal = (college) => {
+          setModalCollege(college);
+      };
+
+      const closeModal = () => {
+          setModalCollege(null);
       };
       
-      const areFiltersActive = searchTerm || selectedLocations.length > 0 || selectedType !== 'All';
+      const areFiltersActive = searchTerm || selectedLocations.length > 0 || selectedType !== 'All' || selectedStream !== 'All';
 
       return (
         <div className="flex bg-gray-100 min-h-screen">
@@ -120,9 +192,26 @@
             <Header />
             
             <section className="card p-6 mb-8">
+              {quizRecommendedStream && (
+                <div className="bg-indigo-50 border-l-4 border-indigo-500 p-4 mb-4">
+                  <p className="font-semibold text-indigo-700">Based on your quiz results, your recommended stream is: <span className="font-bold">{quizRecommendedStream}</span>.</p>
+                  <p className="text-sm text-indigo-600 mt-1">The filter has been automatically set for you, but you can change it below to explore other streams.</p>
+                </div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-                <div className="col-span-1 lg:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Search Colleges or Courses</label>
+                <div className="col-span-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Stream</label>
+                  <select className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value={selectedStream} onChange={(e) => setSelectedStream(e.target.value)}>
+                    <option value="All">All Streams</option>
+                    <option value="Science">Science</option>
+                    <option value="Arts">Arts</option>
+                    <option value="Commerce">Commerce</option>
+                    <option value="Vocational">Vocational</option>
+                  </select>
+                </div>
+                <div className="col-span-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Search Colleges</label>
                   <input type="text" placeholder="e.g., IIT, B.Tech"
                     className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
@@ -149,6 +238,7 @@
               { areFiltersActive && (
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   <span className="text-gray-600 font-medium">Active Filters:</span>
+                  {selectedStream !== 'All' && <span className="bg-indigo-500 text-white text-xs font-semibold px-3 py-1 rounded-full">{selectedStream} Stream</span>}
                   {selectedType !== 'All' && <span className="bg-purple-500 text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center">{selectedType}<button onClick={() => setSelectedType('All')} className="ml-2 -mr-1 opacity-75 hover:opacity-100">&times;</button></span>}
                   {selectedLocations.map(loc => <span key={loc} className="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center">{loc}<button onClick={() => removeLocation(loc)} className="ml-2 -mr-1 opacity-75 hover:opacity-100">&times;</button></span>)}
                   <button onClick={handleResetFilters} className="text-sm text-indigo-500 hover:underline ml-auto">Reset Filters</button>
@@ -160,11 +250,11 @@
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredColleges.length > 0 ? filteredColleges.map(college => (
-                <div key={college.id} className="card p-6 flex flex-col">
+                <div key={college.id} className="card p-6 flex flex-col" onClick={() => openModal(college)}>
                   <div className="flex items-center mb-4">
                     <img src={`https://logo.clearbit.com/${new URL(college.url).hostname}`} alt={`${college.name} logo`} className="w-12 h-12 rounded-xl mr-4 border" onError={(e) => { e.target.onerror = null; e.target.src='https://i.ibb.co/28pj2Z5/college-placeholder.png'; }}/>
                     <div>
-                      <a href={college.url} target="_blank" rel="noopener noreferrer" className="font-bold text-gray-900 leading-tight hover:text-indigo-600">{college.name}</a>
+                      <a href={college.url} target="_blank" rel="noopener noreferrer" className="font-bold text-gray-900 leading-tight hover:text-indigo-600" onClick={(e) => e.stopPropagation()}>{college.name}</a>
                       <p className="text-sm text-gray-500">{college.location}</p>
                     </div>
                   </div>
@@ -188,6 +278,37 @@
               )}
             </div>
           </main>
+          
+          {modalCollege && (
+            <div className="modal-overlay" onClick={closeModal}>
+              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">{modalCollege.name}</h3>
+                <p className="text-sm text-gray-500 mb-4">{modalCollege.location}</p>
+                <p className="text-gray-700 mb-6">{modalCollege.rationale}</p>
+                
+                <h4 className="font-semibold text-gray-800 mb-2">Relevant Courses from Your Stream:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {modalCollege.courses.filter(course => {
+                    const streamCourses = {
+                      "Science": ["B.Tech", "B.E.", "M.Sc", "MBBS", "B.Sc", "MCA", "Ph.D"],
+                      "Arts": ["B.A.", "M.A.", "B.A. LLB", "LL.M", "B.F.A.", "Ph.D", "B.A. (Hons)", "PG Diploma in Journalism", "B.Sc (Economics)"],
+                      "Commerce": ["B.Com", "BBA", "MBA", "PGP", "MBA (IB)", "BMS"],
+                      "Vocational": ["Diploma", "ITI", "B.Des", "M.Des", "Diploma in Handloom", "PGP in Construction Mgt", "B.F.Tech"]
+                    };
+                    const recommendedCourses = streamCourses[quizRecommendedStream] || [];
+                    return recommendedCourses.some(rc => course.includes(rc));
+                  }).map((course, index) => (
+                    <span key={index} className="text-sm bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full font-medium">{course}</span>
+                  ))}
+                </div>
+                
+                <div className="mt-6 flex justify-end">
+                    <a href={modalCollege.url} target="_blank" rel="noopener noreferrer" className="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">Visit College Website</a>
+                </div>
+                <button onClick={closeModal} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
+              </div>
+            </div>
+          )}
         </div>
       );
     }
@@ -197,5 +318,4 @@
 
   </script>
 </body>
-
 </html>
